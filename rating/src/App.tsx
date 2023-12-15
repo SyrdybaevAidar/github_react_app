@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Panel } from './Panel';
-
-function App() {
+const App = () => {
   return(<Panel/>);
 }
 

@@ -1,31 +1,42 @@
-import {useState} from 'react';
-import setDayOfYear from 'date-fns/setDayOfYear';
+import format from 'date-fns/format'
+import addDays from 'date-fns/addDays'
 import startOfWeek from 'date-fns/startOfWeek'
 import "./Panel.css";
-import { Tooltip } from 'react-tooltip';
 
 const weekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 const mounths = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль","Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
-class mounth{
-    days: number[] = [];
-    mounth: number = 0;
-    year: number = 0;
-}
+let result = await fetch("https://dpg.gg/test/calendar.json");
+let json = await result.json();
+console.log(json);
+
+var options = {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+};
 
 var currentDate = new Date();
-var firstDate = setDayOfYear(currentDate, -357);
-var firstDateOfWeek = startOfWeek(firstDate);
-
+var firstDate = addDays(currentDate, -357);
+var firstDateOfWeek = startOfWeek(firstDate, { weekStartsOn: 1 });
 export const Panel = () => {
-    const [isHovered, setIsHovered] = useState("")
-    const handleMouseOver = (e: React.MouseEvent) => {
-        setIsHovered(e.currentTarget.id)
-    }
     
     return <div className='panel-container'>
-        {[...Array(357).keys()].map((value) => <span id={value.toString()} onMouseOver={handleMouseOver} onMouseOut={() => setIsHovered("")}>
-        {isHovered === value.toString() && value}
-        </span>)}
+        {[...Array(357).keys()].map((value) => {
+        let iterationDate = addDays(firstDateOfWeek, value);
+        let contributionCount = json[format(iterationDate, "yyyy-MM-dd")] === undefined ? 0 : json[format(iterationDate, "yyyy-MM-dd")];
+
+        return <span className='tooltip'>
+                    <span className='tooltiptext'>
+                        <p className='tooltip-contribution'>{contributionCount} Contributions</p>
+                        <p className='tooltip-date'>{iterationDate.toLocaleDateString("ru-RU", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                        })}</p>
+                        </span> 
+               </span>;})}
     </div>
 };
