@@ -9,19 +9,21 @@ import isFriday from 'date-fns/isFriday'
 import isSaturday from 'date-fns/isSaturday'
 import isSunday from 'date-fns/isSunday'
 import { ContributionDate } from './ContributionDate';
+import { getMonths } from './Common';
 import "./Panel.css";
 
 const weekDays = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
-const mounths = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+const mounths = ["Янв.", "Фев.", "Март", "Апр.", "Май.", "Июнь", "Июль", "Авг.", "Сент.", "Окт.", "Ноя.", "Дек."];
 
 let result = await fetch("https://dpg.gg/test/calendar.json");
 let json = await result.json();
-console.log(json);
 
 let currentDate = new Date();
 let firstDate = addDays(currentDate, -357);
 let firstDateOfWeek = startOfWeek(firstDate, { weekStartsOn: 1 });
 let datesByWeekDays: Array<Array<Date>> = [[], [], [], [], [], [], []];
+let allFirstDaysMounths = getMonths(firstDateOfWeek, currentDate);
+console.log(allFirstDaysMounths);
 
 [...Array(357).keys()].forEach(element => {
     let iterationDate = addDays(firstDateOfWeek, element);
@@ -57,6 +59,9 @@ const convertDateByComponent = (dates: Date[]) => {
 export const Panel = () => {
 
     return <div className='container'>
+        <div className='month-container'>
+            {allFirstDaysMounths.map(it => <span className='month'>{mounths[it.month-1]}</span>)}
+        </div>
         <div className="contribution-container">
             <div className='week-container'>
                 {weekDays.map(it => <span>{it}</span>)}
